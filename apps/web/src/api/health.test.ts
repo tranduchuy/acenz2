@@ -28,6 +28,12 @@ describe("fetchHealth", () => {
     await expect(fetchHealth(json({ foo: 1 }, 200))).rejects.toBeInstanceOf(SchemaValidationError);
   });
 
+  it("fetchHealth rejects with a clear message on a non-JSON response", async () => {
+    const html = (async () =>
+      new Response("<html>Bad Gateway</html>", { status: 502 })) as typeof fetch;
+    await expect(fetchHealth(html)).rejects.toThrow(/non-JSON.*HTTP 502/);
+  });
+
   it("fetchHealth rejects on network error", async () => {
     const failing = (async () => {
       throw new TypeError("Failed to fetch");
