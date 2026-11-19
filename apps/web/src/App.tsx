@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { HealthResponse } from "@acenz/shared";
 import { fetchHealth } from "./api/health";
+import { Button } from '@acenz/ui'
 
 type State =
   | { kind: "loading" }
@@ -33,6 +34,7 @@ export default function App() {
         </dl>
       )}
       {state.kind === "error" && <p role="alert">API error: {state.message}</p>}
+      <Button variant="primary" type="button">test</Button>
     </main>
   );
 }

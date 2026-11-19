@@ -1,0 +1,4 @@
+{
+  "extends": "@acenz/tsconfig/library.json",
+  "include": ["src", "tsup.config.ts"]
+}

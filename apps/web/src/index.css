@@ -1,0 +1,8 @@
+@import "tailwindcss";
+/* ACENZ tokens as Tailwind theme: bg-brand, text-ink, bg-surface-raised, rounded-lg, text-h1, md:… (768px) */
+@import "@acenz/tokens/tailwind.css";
+/* ACENZ components (layer components — utilities override them) */
+@import "@acenz/ui/styles.css";
+
+/* Scan @acenz/ui sources too, for any utility classes used inside components */
+@source "../../../packages/ui/src";

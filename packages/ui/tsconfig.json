@@ -1,0 +1,4 @@
+{
+  "extends": "@acenz/tsconfig/react.json",
+  "include": ["src", "tsup.config.ts"]
+}
