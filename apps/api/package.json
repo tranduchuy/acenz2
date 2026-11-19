@@ -10,7 +10,9 @@
     "start": "node --env-file-if-exists=../../.env dist/index.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "eslint src scripts",
+    "db:export": "node scripts/db-export.js",
+    "db:import": "node scripts/db-import.js",
     "migration:generate": "pnpm build && node --env-file-if-exists=../../.env node_modules/typeorm/cli.js -d dist/db/data-source.js migration:generate",
     "migration:run": "pnpm build && node --env-file-if-exists=../../.env node_modules/typeorm/cli.js -d dist/db/data-source.js migration:run",
     "migration:revert": "pnpm build && node --env-file-if-exists=../../.env node_modules/typeorm/cli.js -d dist/db/data-source.js migration:revert"
