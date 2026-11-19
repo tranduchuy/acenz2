@@ -110,11 +110,20 @@ Component đang chuyển dần từ CSS `ic-*` (`packages/ui/src/styles.css`) sa
 | Nhóm | Component | Trạng thái |
 |---|---|---|
 | 1 · Primitives | Button, Badge, StatusBadge, SkillTag, BandScore, Avatar, ProgressBar, Tabs | ✅ Tailwind |
-| 2 · Forms | TextField, SearchInput, Select, Checkbox, Radio, Switch, DatePicker, SubmissionUpload | ⏳ CSS `ic-*` |
+| 2 · Forms | TextField, SearchInput, Select, Checkbox, Radio, Switch, DatePicker, SubmissionUpload | ✅ Tailwind (`src/forms/`) |
 | 3 · Feedback | Dialog, Toast, Banner, Tooltip, EmptyState, Skeleton | ⏳ |
 | 4 · Layout | AppShell, Sidebar, Topbar, BottomNav, Breadcrumb, Pagination | ⏳ |
 | 5 · Data | StatCard, ClassCard, AssignmentItem, RosterTable, NotificationItem, SkillBreakdown, BandTrendChart | ⏳ |
 | 6 · IELTS | CountdownTimer, ScheduleCalendar, AttendanceToggle, GradingPanel, FeedbackComment, AudioPlayer, AudioRecorder, AnnouncementComposer | ⏳ |
+
+Còn giữ tạm trong `styles.css` vì component nhóm khác đang dùng — xoá khi nhóm đó chuyển xong:
+
+| Rule | Ai còn dùng | Xoá ở |
+|---|---|---|
+| `.ic-iconbtn*` | Topbar (layout), Toast/Dialog (feedback) | nhóm 3, 4 |
+| `.ic-input`, `.ic-select*` | ô chọn điểm trong GradingPanel (ielts) | nhóm 6 |
+
+Quy ước cho nhóm đã chuyển: mỗi component một file `.tsx` trong thư mục `packages/ui/src/<nhóm>/`, viết bằng function component; `index.ts` của thư mục export lại, `src/index.ts` giữ nguyên `export * from "./<nhóm>"`. Helper dùng chung trong nhóm (class dùng lại, `FieldFoot`…) nằm cạnh, không export ra ngoài package.
 
 Khi chuyển một component:
 
@@ -133,7 +142,7 @@ Nguyên tắc: **một nguồn sự thật cho mỗi thứ**, và mọi thay đ�
 | Thứ | Nguồn sự thật |
 |---|---|
 | Màu, font, spacing, radius, shadow, breakpoint | `packages/tokens/src/tokens.json` |
-| Component (giao diện + hành vi) | `packages/ui/src/*.tsx` |
+| Component (giao diện + hành vi) | `packages/ui/src/**/*.tsx` |
 | Logic nghiệp vụ dùng chung | `packages/core/src` |
 | Quy tắc dùng (khi nào dùng gì, giọng văn) | README của design system |
 
@@ -154,14 +163,14 @@ Nguyên tắc: **một nguồn sự thật cho mỗi thứ**, và mọi thay đ�
 **B. Đổi giao diện một component**
 
 1. Sửa trên design system để chốt thiết kế.
-2. Sửa `packages/ui/src/<nhóm>.tsx` cho khớp (dev).
+2. Sửa `packages/ui/src/<nhóm>/<Component>.tsx` cho khớp (dev). Nhóm chưa chuyển vẫn là một file `<nhóm>.tsx`.
 3. Nếu thêm/bỏ prop: cập nhật types và mọi chỗ dùng trong `apps/web`.
 4. PR: `feat(ui): …` / `fix(ui): …`, kèm ảnh trước/sau.
 
 **C. Thêm component mới**
 
 1. Thiết kế + viết guideline trên design system.
-2. Tạo component trong file nhóm phù hợp của `packages/ui/src`, export ở `index.ts`, viết bằng Tailwind + token ngay từ đầu.
+2. Tạo `<Component>.tsx` (một component một file) trong thư mục nhóm phù hợp của `packages/ui/src`, export ở `index.ts` của nhóm, viết bằng Tailwind + token ngay từ đầu.
 3. Logic dùng chung (nếu có) đặt ở `@acenz/core`.
 4. PR `feat(ui): add <Tên>`.
 

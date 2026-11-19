@@ -166,7 +166,7 @@ export function AnnouncementComposer({ classes = ["Tất cả lớp"], defaultCl
   const [email, setEmail] = useState(true);
   const [pin, setPin] = useState(false);
   return (
-    <div className={cx("ic-card ic-compose", className)}>
+    <div className={cx("ic-card ic-compose [&_textarea]:text-body", className)}>
       <h3>{heading}</h3>
       <Select label="Gửi đến" options={classes} value={audience} onChange={(e) => setAudience(e.target.value)} />
       <TextField label="Tiêu đề" placeholder="VD: Lịch thi thử Mock test tháng 12" value={title} onChange={(e) => setTitle(e.target.value)} />

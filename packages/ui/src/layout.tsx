@@ -102,7 +102,7 @@ export function Topbar({ title, breadcrumb, unread, user, search = true, searchP
         {title && <h1>{title}</h1>}
       </div>
       <div className="ic-topbar-tools">
-        {search && <SearchInput placeholder={searchPlaceholder} />}
+        {search && <SearchInput placeholder={searchPlaceholder} className="[@container_topbar_(max-width:640px)]:hidden" />}
         {actions}
         <button type="button" className="ic-iconbtn" aria-label={`Thông báo${unread ? ` (${unread} chưa đọc)` : ""}`} onClick={onBell}>
           <Icon name="bell" />
