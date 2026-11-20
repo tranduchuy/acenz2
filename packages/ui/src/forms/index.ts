@@ -1,5 +1,6 @@
 // Forms group — one component per file. FieldFoot, CheckText, CheckLikeProps and styles are internal (not exported).
 export { TextField, type TextFieldProps } from "./TextField";
+export { PasswordField, type PasswordFieldProps } from "./PasswordField";
 export { SearchInput, type SearchInputProps } from "./SearchInput";
 export { Select, type SelectOption, type SelectProps } from "./Select";
 export { Checkbox } from "./Checkbox";

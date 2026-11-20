@@ -110,7 +110,7 @@ Component đang chuyển dần từ CSS `ic-*` (`packages/ui/src/styles.css`) sa
 | Nhóm | Component | Trạng thái |
 |---|---|---|
 | 1 · Primitives | Button, Badge, StatusBadge, SkillTag, BandScore, Avatar, ProgressBar, Tabs | ✅ Tailwind |
-| 2 · Forms | TextField, SearchInput, Select, Checkbox, Radio, Switch, DatePicker, SubmissionUpload | ✅ Tailwind (`src/forms/`) |
+| 2 · Forms | TextField, PasswordField, SearchInput, Select, Checkbox, Radio, Switch, DatePicker, SubmissionUpload | ✅ Tailwind (`src/forms/`) |
 | 3 · Feedback | Dialog, Toast, Banner, Tooltip, EmptyState, Skeleton | ⏳ |
 | 4 · Layout | AppShell, Sidebar, Topbar, BottomNav, Breadcrumb, Pagination | ⏳ |
 | 5 · Data | StatCard, ClassCard, AssignmentItem, RosterTable, NotificationItem, SkillBreakdown, BandTrendChart | ⏳ |
