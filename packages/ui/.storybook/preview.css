@@ -4,3 +4,9 @@
 /* Source, not dist: editing styles.css hot-reloads the preview. */
 @import "../src/styles.css";
 @source "../src";
+
+/* Docs pages keep Storybook's light chrome; put each story canvas on the theme surface so
+   dark-theme components are shown on their real background. */
+.docs-story {
+  @apply bg-surface;
+}
