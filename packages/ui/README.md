@@ -38,6 +38,11 @@ The default Tailwind palette, type scale, radii, shadows and breakpoints are rep
 
 Use utilities for page layout; use components for UI parts. A `className` utility on a component overrides its default style.
 
+## Storybook
+
+Browse the components and play with their props: `pnpm storybook` from the repo root (port 6006).
+How to run it and how to add a story: `docs/design-system.md`, section 2, "Storybook".
+
 ## Source of truth
 
 `src/styles.css` mirrors the design system's `components/bundle.css`; `@acenz/tokens/src/tokens.json` mirrors its `tokens.json`.
