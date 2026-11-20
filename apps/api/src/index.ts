@@ -1,8 +1,13 @@
 import "reflect-metadata";
 import { createApp } from "./app";
+import { createLoginService } from "./auth/login-service";
+import { verifyPassword } from "./auth/password";
+import { issueToken } from "./auth/token";
+import { createFindUserByEmail } from "./auth/user-repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
 import { createDataSource } from "./db/create-data-source";
+import { createEnsureInitialized } from "./db/ensure-initialized";
 import { startServer } from "./server";
 
 async function main(): Promise<void> {
@@ -14,7 +19,14 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const checkDb = createDbCheck(createDataSource(env));
+  const dataSource = createDataSource(env);
+  const ensureInitialized = createEnsureInitialized(dataSource);
+  const checkDb = createDbCheck(dataSource, ensureInitialized);
+  const login = createLoginService({
+    findUserByEmail: createFindUserByEmail(dataSource, ensureInitialized),
+    verifyPassword,
+    issueToken,
+  });
 
   // Do not block startup on the database: /api/health reports "degraded" until it is reachable.
   void checkDb().then((up) => {
@@ -22,7 +34,7 @@ async function main(): Promise<void> {
   });
 
   try {
-    await startServer(createApp({ checkDb }), env.API_PORT);
+    await startServer(createApp({ checkDb, login }), env.API_PORT);
   } catch (err) {
     console.error(`Failed to listen on port ${env.API_PORT}: ${(err as Error).message}`);
     process.exit(1);
