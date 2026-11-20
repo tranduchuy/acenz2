@@ -1,4 +1,4 @@
 {
   "extends": "@acenz/tsconfig/react.json",
-  "include": ["src", "tsup.config.ts"]
+  "include": ["src", ".storybook", "tsup.config.ts"]
 }
