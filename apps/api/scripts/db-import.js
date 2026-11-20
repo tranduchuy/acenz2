@@ -6,6 +6,9 @@
 // *.sql  -> psql (plain SQL)
 // other  -> pg_restore (custom/tar format)
 // --clean drops existing objects before restoring (DESTRUCTIVE; asks to confirm).
+// --data-only restores rows only (pg_restore --data-only); create the schema first with
+//   `pnpm --filter @acenz/api migration:run`. Not valid with .sql files or --clean.
+//   Adds --disable-triggers (tables are not loaded in FK order); needs a superuser.
 "use strict";
 const { spawn } = require("node:child_process");
 const { createReadStream, existsSync } = require("node:fs");
@@ -29,6 +32,9 @@ const HELP = `Usage: db:import <file> [options]
   -f, --file <file>       Dump file (or pass as first argument)
       --create            Create the target database first if it does not exist
       --clean             Drop existing objects before restoring (destructive)
+      --data-only         Restore table data only (no CREATE statements); the schema must
+                          already exist, e.g. via migration:run. Needs a .dump, not .sql,
+                          and a superuser (uses --disable-triggers to skip FK ordering)
   -y, --yes               Skip the confirmation prompt
   -h, --help
 `;
@@ -38,6 +44,7 @@ async function main() {
     file: { type: "string", short: "f" },
     create: { type: "boolean" },
     clean: { type: "boolean" },
+    "data-only": { type: "boolean" },
     yes: { type: "boolean", short: "y" },
   });
   if (values.help) {
@@ -53,6 +60,17 @@ async function main() {
   const file = resolve(fileArg);
   if (!existsSync(file)) {
     console.error(`File not found: ${file}`);
+    process.exit(2);
+  }
+
+  const isSql = file.toLowerCase().endsWith(".sql");
+  const dataOnly = values["data-only"];
+  if (dataOnly && isSql) {
+    console.error("--data-only needs a pg_dump custom-format file (.dump), not a plain .sql file.");
+    process.exit(2);
+  }
+  if (dataOnly && values.clean) {
+    console.error("--data-only cannot be combined with --clean (nothing is dropped or created).");
     process.exit(2);
   }
 
@@ -78,12 +96,11 @@ async function main() {
     if (code !== 0) process.exit(code);
   }
 
-  const isSql = file.toLowerCase().endsWith(".sql");
   const script = isSql
     ? `psql -U "${PG_USER}" -d "${PG_DB}" -v ON_ERROR_STOP=1 -q`
     : `pg_restore -U "${PG_USER}" -d "${PG_DB}" --no-owner --no-acl --exit-on-error${
         values.clean ? " --clean --if-exists" : ""
-      }`;
+      }${dataOnly ? " --data-only --disable-triggers" : ""}`;
 
   console.error(`Importing ${file} -> ${container}/${dbLabel}`);
   const child = spawn("docker", [...args, "sh", "-c", script], {

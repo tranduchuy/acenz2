@@ -2,6 +2,49 @@
 
 Express + TypeORM API.
 
+## First-time setup
+
+Requirements: Node >= 24, pnpm, Docker. Run everything from the repo root.
+
+```bash
+# 1. Environment + database (Postgres 18, data stored in ./pg-data)
+cp .env.example .env
+docker compose up -d db        # wait until `docker compose ps` shows "healthy"
+
+# 2. Dependencies and workspace packages
+pnpm install
+pnpm build                     # builds @acenz/shared etc.; the API imports them from dist/
+
+# 3. Create the schema (runs the InitialSchema migration; tables are empty)
+pnpm --filter @acenz/api migration:run
+
+# 4. Start everything (API on :3000, web on :5173)
+pnpm dev
+```
+
+Check `http://localhost:3000/api/health`: it reports `degraded` until the API connects to the DB.
+
+**Optional: load existing data.** Ask a teammate for a `.dump` made by `db:export` and put it in
+`apps/api/backups/` (git-ignored). With the schema already created in step 3, restore only the rows:
+
+```bash
+pnpm --filter @acenz/api db:import backups/<file>.dump -c acenz2-db-1 --data-only
+```
+
+The container name is `acenz2-db-1` when the repo folder is called `acenz2`; check with
+`docker compose ps`. `--data-only` fits a dump taken after the InitialSchema migration, and it needs
+the schema to exist first (otherwise `pg_restore` fails on missing tables).
+
+Notes:
+
+- **Do not run `migration:run` on a database that already has these tables** (for example after a
+  full schema + data import): the migration fails with `relation ... already exists`. On a fresh
+  database always use `migration:run` followed by `--data-only`.
+- **Start over from an empty database:** `docker compose down`, delete `./pg-data`,
+  `docker compose up -d db`, then repeat step 3. This destroys all local data, so export first.
+- Later schema changes go through migrations only (`synchronize` is off):
+  `migration:generate src/db/migrations/<Name>`, `migration:run`, `migration:revert`.
+
 ## Database export / import (Docker)
 
 Helper scripts in [`scripts/`](scripts/) dump and restore a PostgreSQL database
@@ -64,6 +107,10 @@ pnpm db:import backups/my.dump -c <container> --clean
 pnpm db:import backups/my.dump -c <container> --clean --yes
 ```
 
+- `--data-only` restores rows only, into a schema you created beforehand with `migration:run`.
+  It runs `pg_restore --data-only --disable-triggers`: tables are not loaded in foreign-key order,
+  so FK checks are suspended during the load (this needs a superuser, which the container's
+  `POSTGRES_USER` is). It works only with `.dump` files, and cannot be combined with `--clean`.
 - Files ending in `.sql` are loaded with `psql`; anything else is restored with `pg_restore`.
 - The import stops on the first error. Restoring into a database that already contains the same
   objects fails unless you use `--clean`.
@@ -105,4 +152,4 @@ pnpm db:import backups/my.dump -c <container> --db <db>
 
 `db:export` also accepts `-o, --out <file>` and `--plain`;
 `db:import` also accepts `-f, --file <file>` (or pass the file as the first argument),
-`--create`, `--clean` and `-y, --yes`. Run either script with `--help` for the full list.
+`--create`, `--clean`, `--data-only` and `-y, --yes`. Run either script with `--help` for the full list.
