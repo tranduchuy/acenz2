@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "skills": {
+    "express-typescript": {
+      "source": "Mindrally/skills",
+      "commit": "7682ca77710e0971eab4e0ae5dddfa281aea0ba5",
+      "sourceType": "github",
+      "skillPath": "express-typescript/SKILL.md",
+      "computedHash": "246f38358aa85ce3b172c23913c3874d842ce4dda7c30f56889e26eab6115c60"
+    },
+    "react-vite-best-practices": {
+      "source": "asyrafhussin/agent-skills",
+      "commit": "1aa0ff717c10309226c9e678f00873976450fd76",
+      "sourceType": "github",
+      "skillPath": "skills/react-vite-best-practices/SKILL.md",
+      "computedHash": "db8e3e2224aa28562593fb65b9e588fa71a5568e641958b935006bd288d71f4c"
+    },
+    "tailwind-design-system": {
+      "source": "wshobson/agents",
+      "commit": "42203085cfc5736204bf0f6d436dff7e1da0bf3f",
+      "sourceType": "github",
+      "skillPath": "plugins/frontend-mobile-development/skills/tailwind-design-system/SKILL.md",
+      "computedHash": "c807f0c9619e8c389879f55846c2e395956f1073ab6d01a93fbb30b340015ab1"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "commit": "99233190d0dd77d9ae6ea897297a5adc20244ef6",
+      "sourceType": "github",
+      "skillPath": "skills/turborepo/SKILL.md",
+      "computedHash": "49bb6427015253ce5d93f15dfa6c9ade3f8528f0fbe54769b6da1e1458f058d4"
+    },
+    "typeorm": {
+      "source": "Mindrally/skills",
+      "commit": "7682ca77710e0971eab4e0ae5dddfa281aea0ba5",
+      "sourceType": "github",
+      "skillPath": "typeorm/SKILL.md",
+      "computedHash": "4c478516721fe6f4f6889f74a409dda9f39480ede215ddb941d92a8c9e5d6302"
+    }
+  }
+}
