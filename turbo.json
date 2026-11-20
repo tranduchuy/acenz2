@@ -16,6 +16,10 @@
     "lint": {},
     "test": {
       "dependsOn": ["^build"]
+    },
+    "e2e": {
+      "dependsOn": ["^build", "@acenz/api#build"],
+      "cache": false
     }
   }
 }
