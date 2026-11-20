@@ -15,11 +15,13 @@ describe("verifyPassword", () => {
   });
 
   it.each(["", null, undefined, 123, "x".repeat(59), "x".repeat(61)])(
-    "returns false for unusable stored value %j without calling bcrypt",
+    "returns false for unusable stored value %j, comparing against the dummy hash only",
     async (stored) => {
       const compare = vi.spyOn(bcrypt, "compare");
       await expect(verifyPassword(FIXTURE_PASSWORD, stored)).resolves.toBe(false);
-      expect(compare).not.toHaveBeenCalled();
+      // Same bcrypt cost as a real check, so a missing hash isn't revealed by response time.
+      expect(compare).toHaveBeenCalledTimes(1);
+      expect(compare).toHaveBeenCalledWith(FIXTURE_PASSWORD, DUMMY_HASH);
     },
   );
 
