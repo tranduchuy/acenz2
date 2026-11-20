@@ -19,6 +19,11 @@ docker-compose.yml   Postgres 18 for local development
 - Node 24+ (`.nvmrc`)
 - pnpm
 - Docker (for local Postgres)
+- [GitHub CLI](https://cli.github.com) (`gh`), authenticated with `gh auth login`
+- Atlassian MCP server connected to Claude Code, with access to the Jira site
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
+
+`gh` and the Atlassian MCP are used by the `ticket-to-pr` skill (`.claude/skills/ticket-to-pr`) to read Jira tickets and open pull requests.
 
 ## Getting started
 
