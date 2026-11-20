@@ -1,20 +1,16 @@
 import type { DataSource } from "typeorm";
 import type { DbCheck } from "../routes/health";
+import { createEnsureInitialized } from "./ensure-initialized";
 
 type CheckableDataSource = Pick<DataSource, "isInitialized" | "initialize" | "query">;
 
-// Concurrent callers share one in-flight initialize(); TypeORM throws if initialize() runs twice.
-export function createDbCheck(dataSource: CheckableDataSource): DbCheck {
-  let initPromise: Promise<unknown> | undefined;
-
+export function createDbCheck(
+  dataSource: CheckableDataSource,
+  ensureInitialized: () => Promise<void> = createEnsureInitialized(dataSource),
+): DbCheck {
   return async () => {
     try {
-      if (!dataSource.isInitialized) {
-        initPromise ??= dataSource.initialize().finally(() => {
-          initPromise = undefined;
-        });
-        await initPromise;
-      }
+      await ensureInitialized();
       await dataSource.query("SELECT 1");
       return true;
     } catch {
