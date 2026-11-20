@@ -7,3 +7,4 @@ coverage
 docs/superpowers
 apps/api/backups
 pg-data
+storybook-static

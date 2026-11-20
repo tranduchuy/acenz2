@@ -1,0 +1,6 @@
+/* Same imports as apps/web/src/index.css, so stories render exactly like the app. */
+@import "tailwindcss";
+@import "@acenz/tokens/tailwind.css";
+/* Source, not dist: editing styles.css hot-reloads the preview. */
+@import "../src/styles.css";
+@source "../src";
