@@ -50,7 +50,7 @@ export default function LoginPage() {
     <div className="min-h-dvh bg-surface font-sans text-ink lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       {/* Desktop brand panel */}
       <aside className="hidden flex-col justify-between gap-10 bg-brand px-12 pt-12 pb-10 text-on-brand lg:flex" data-testid="login-brand-panel">
-        <img src={logoWhite} alt="ACENZ" className="h-11 w-auto self-start" />
+        <img src={logoWhite} alt="ACENZ" className="h-11 w-auto self-start dark:invert" />
         <div className="flex max-w-[480px] flex-col gap-8">
           <h2 className="m-0 text-display">{TAGLINE}</h2>
           <ul className="m-0 flex list-none flex-col gap-4 p-0 text-body">
@@ -68,7 +68,7 @@ export default function LoginPage() {
       <div className="flex min-h-dvh flex-col lg:min-h-0">
         {/* Mobile header band */}
         <header className="flex flex-col gap-4 bg-brand px-6 pt-8 pb-6 text-on-brand lg:hidden">
-          <img src={logoWhite} alt="ACENZ" className="h-8 w-auto self-start" />
+          <img src={logoWhite} alt="ACENZ" className="h-8 w-auto self-start dark:invert" />
           <p className="m-0 text-h2 font-extralight">{TAGLINE}</p>
         </header>
 
