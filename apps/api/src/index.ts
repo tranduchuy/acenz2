@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { createApp } from "./app";
 import { createLoginService } from "./auth/login-service";
 import { verifyPassword } from "./auth/password";
-import { issueToken } from "./auth/token";
+import { createTokenIssuer } from "./auth/token";
 import { createFindUserByEmail } from "./auth/user-repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   const login = createLoginService({
     findUserByEmail: createFindUserByEmail(dataSource, ensureInitialized),
     verifyPassword,
-    issueToken,
+    issueToken: createTokenIssuer({ secret: env.JWT_SECRET, expiresInSeconds: env.JWT_EXPIRES_IN_SECONDS }),
   });
 
   // Do not block startup on the database: /api/health reports "degraded" until it is reachable.

@@ -1,6 +1,6 @@
 import { AUTH_ERROR, type AuthErrorCode } from "@acenz/shared";
 import { DUMMY_HASH, verifyPassword } from "./password";
-import type { issueToken } from "./token";
+import type { IssueToken } from "./token";
 import type { FindUserByEmail } from "./user-repository";
 
 export type LoginResult = { ok: true; token: string } | { ok: false; code: AuthErrorCode };
@@ -9,7 +9,7 @@ export type LoginFn = (email: string, password: string) => Promise<LoginResult>;
 export interface LoginServiceDeps {
   findUserByEmail: FindUserByEmail;
   verifyPassword: typeof verifyPassword;
-  issueToken: typeof issueToken;
+  issueToken: IssueToken;
 }
 
 const INVALID: LoginResult = { ok: false, code: AUTH_ERROR.INVALID_CREDENTIALS };

@@ -19,7 +19,12 @@ export default defineConfig({
       command: "node --env-file-if-exists=../../.env dist/index.js",
       cwd: "../api",
       port: API_PORT,
-      env: { DATABASE_URL: E2E_DATABASE_URL, API_PORT: String(API_PORT), NODE_ENV: "test" },
+      env: {
+        DATABASE_URL: E2E_DATABASE_URL,
+        API_PORT: String(API_PORT),
+        NODE_ENV: "test",
+        JWT_SECRET: "e2e-only-secret-e2e-only-secret-e2e",
+      },
       reuseExistingServer: false,
     },
     {
