@@ -20,6 +20,15 @@
     "e2e": {
       "dependsOn": ["^build", "@acenz/api#build"],
       "cache": false
+    },
+    "storybook": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
     }
   }
 }

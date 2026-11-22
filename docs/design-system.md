@@ -69,6 +69,27 @@ Tailwind **chỉ biên dịch ở app** (plugin `@tailwindcss/vite`). `@acenz/ui
 
 Đặt `data-theme="dark"` trên `<html>`. Mọi màu token tự đổi; biến thể `dark:` cũng theo thuộc tính này.
 
+### Storybook
+
+Storybook liệt kê các component của `@acenz/ui` và cho chỉnh props trực tiếp (bảng **Controls**), không cần chạy `apps/web`.
+
+```bash
+pnpm storybook         # dev server http://localhost:6006 — turbo build tokens + core trước
+pnpm build-storybook   # site tĩnh ở packages/ui/storybook-static
+```
+
+Chạy từ thư mục gốc. `pnpm --filter @acenz/ui storybook` cũng được, nhưng chỉ khi `tokens` và `core` đã build.
+
+- Preview dùng cùng CSS với app (`.storybook/preview.css`) và cùng font (`.storybook/preview-head.html`).
+- Nút **Theme** trên toolbar đổi `data-theme` giữa `light` và `dark`.
+
+Thêm story cho một component:
+
+1. Tạo `<Component>.stories.tsx` cạnh file định nghĩa component. Ví dụ mẫu: `packages/ui/src/Button.stories.tsx`.
+2. `title` theo dạng `<Nhóm>/<Component>` (`Primitives/Button`, `Forms/TextField`).
+3. Khai báo props mặc định trong `args` để Controls hiện ra; chữ mẫu tiếng Việt, câu ngắn.
+4. Chỉ dùng token, không hard-code màu.
+
 ---
 
 ## 3. Dùng token trong code

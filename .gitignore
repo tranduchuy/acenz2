@@ -9,3 +9,4 @@ apps/api/backups
 pg-data
 apps/e2e/test-results
 apps/e2e/playwright-report
+storybook-static

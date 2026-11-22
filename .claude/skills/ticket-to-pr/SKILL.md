@@ -12,10 +12,37 @@ Orchestrates other skills for one ticket in the acenz2 monorepo. It adds no new 
 - Acceptance criteria are missing, vague or contradict the code → ask before designing.
 - The change would touch something outside the ticket's scope (token rename, shared DTO shape, migration on existing data) → ask.
 - Before `git push`, opening the PR, commenting on or transitioning the Jira ticket → confirm, unless the user's request already said to do it.
+- A design doc or plan is not approved until the user approves it in Plannotator (see "Plan review" below).
+
+## Branch first
+
+Before any change to the working tree (design doc, plan, skill edit, dependency install, code), check out a new branch named after the ticket key. Never work on `main`.
+
+```bash
+git fetch origin main
+git switch -c <type>/<KEY>-<short-slug> --no-track origin/main   # e.g. chore/AZ-205-storybook-setup
+```
+
+- `type` is `feat`, `fix`, `chore` or `refactor`; `KEY` is the Jira key exactly as written (`AZ-205`).
+- `--no-track` matters: a branch that tracks `origin/main` would make a bare `git push` target `main`. Push later with `git push -u origin <branch>`.
+- If the working tree is dirty, stop and ask before switching.
+- **Epic key given** (e.g. `AZ-204`): do not branch on the epic. Work its child tickets one at a time in dependency order, each with its own branch, named after the child's key, and its own PR.
+
+## Plan review (Plannotator)
+
+Every design doc (Phase 3) and implementation plan (Phase 4) goes to the user through Plannotator so they can annotate it inline:
+
+```bash
+plannotator annotate <file.md> --gate --json
+```
+
+- Run it in the background with a long timeout (`run_in_background`, `timeout` up to 7200000 ms); it blocks until the user submits. Do not kill it.
+- `decision: "approved"` → continue; treat any `feedback` notes as guidance. `"annotated"` → apply every annotation, then reopen the same file for another round. `"dismissed"` or empty output → ask the user in chat how to proceed.
+- If a `plannotator` tool is available, call it with `{ "action": "annotate", "target": "<file>", "gate": true }` instead of the CLI.
 
 ## Phases
 
-**1. Intake.** Read the ticket with Atlassian MCP: `getAccessibleAtlassianResources` once for `cloudId`, then `getJiraIssue`. Also read linked issues and comments. Write down the acceptance criteria as a numbered list; this list is the definition of done for Phases 6 and 8.
+**1. Intake.** Read the ticket with Atlassian MCP: `getAccessibleAtlassianResources` once for `cloudId`, then `getJiraIssue`. Also read linked issues and comments. Write down the acceptance criteria as a numbered list; this list is the definition of done for Phases 6 and 8. Then create the branch (see "Branch first") before Phase 2.
 
 **2. Classify surfaces.** From the ticket, decide which rows apply. This selects the domain skills for Phase 5.
 
@@ -28,9 +55,9 @@ Orchestrates other skills for one ticket in the acenz2 monorepo. It adds no new 
 | `packages/ui`, `apps/web` styling | `tailwind-design-system`, `react-vite-best-practices`, `docs/design-system.md` |
 | `turbo.json`, new package, workspace or CI config | `turborepo` |
 
-**3. Design.** Invoke `superpowers:brainstorming` for any new behavior or ambiguity. A precise bug fix with a known cause can skip to Phase 4.
+**3. Design.** Invoke `superpowers:brainstorming` for any new behavior or ambiguity. A precise bug fix with a known cause can skip to Phase 4. Send the written design doc through Plannotator for approval.
 
-**4. Isolate and plan.** Invoke `superpowers:using-git-worktrees` (or `git switch -c`) with branch `<type>/<KEY>-<short-slug>`, where type is `feat`, `fix`, `chore` or `refactor`. For work with more than one step, invoke `superpowers:writing-plans`.
+**4. Plan.** The branch already exists (see "Branch first"); use `superpowers:using-git-worktrees` only if the user wants a separate worktree. For work with more than one step, invoke `superpowers:writing-plans`, then send the plan through Plannotator and implement only after it is approved.
 
 **5. Implement.** Invoke `superpowers:test-driven-development`, plus the skills selected in Phase 2. Repo rules that apply here:
 
@@ -68,3 +95,5 @@ Then walk the Phase 1 acceptance criteria one by one and state the evidence for 
 | Verification fails | `superpowers:systematic-debugging`, never a claim of success |
 | Ticket spans api and web | One branch, one PR, commits ordered shared → api → web |
 | Ticket is too large for one PR | Stop after Phase 4 and propose a split to the user |
+| Given an epic key | One branch and PR per child ticket, in dependency order |
+| On `main` or a dirty tree when starting | Branch first; ask before switching a dirty tree |
