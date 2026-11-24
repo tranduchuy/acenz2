@@ -6,3 +6,6 @@ export const BCRYPT_HASH_LENGTH = 60;
  * so that path costs the same time as a wrong password.
  */
 export const DUMMY_HASH = "$2b$10$JodWC0RCUDvpfcQfC9ASQ.m5AEhjJBJQuBs9YEVnb49cEDQ9qRCO6";
+
+/** bcrypt cost for new password hashes; `DUMMY_HASH` uses the same cost. */
+export const BCRYPT_COST = 10;
