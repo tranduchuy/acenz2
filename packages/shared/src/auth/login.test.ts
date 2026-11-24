@@ -1,14 +1,21 @@
 ﻿import { describe, expect, it } from "vitest";
 import { AUTH_ERROR, AUTH_ERROR_STATUS, LoginRequestSchema } from "./login";
 
-describe("login error codes", () => {
-  it("defines exactly the five login codes", () => {
+describe("auth error codes", () => {
+  it("defines the five login codes and the seven register codes", () => {
     expect(Object.values(AUTH_ERROR).sort()).toEqual([
       "AUTH_ACCOUNT_LOCKED",
+      "AUTH_CONFIRM_PASSWORD_REQUIRED",
+      "AUTH_EMAIL_EXISTS",
+      "AUTH_EMAIL_INVALID",
       "AUTH_EMAIL_REQUIRED",
       "AUTH_INTERNAL_ERROR",
       "AUTH_INVALID_CREDENTIALS",
+      "AUTH_NAME_REQUIRED",
+      "AUTH_PASSWORD_MISMATCH",
       "AUTH_PASSWORD_REQUIRED",
+      "AUTH_PHONE_INVALID",
+      "AUTH_PHONE_REQUIRED",
     ]);
   });
 
@@ -19,6 +26,13 @@ describe("login error codes", () => {
       AUTH_INVALID_CREDENTIALS: 401,
       AUTH_ACCOUNT_LOCKED: 403,
       AUTH_INTERNAL_ERROR: 500,
+      AUTH_NAME_REQUIRED: 400,
+      AUTH_EMAIL_INVALID: 400,
+      AUTH_PHONE_REQUIRED: 400,
+      AUTH_PHONE_INVALID: 400,
+      AUTH_CONFIRM_PASSWORD_REQUIRED: 400,
+      AUTH_PASSWORD_MISMATCH: 400,
+      AUTH_EMAIL_EXISTS: 409,
     });
   });
 });

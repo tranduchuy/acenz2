@@ -5,7 +5,8 @@ export type LoginMessage = { field: "email" | "password" | "form"; message: stri
 
 const GENERIC: LoginMessage = { field: "form", message: "Có lỗi xảy ra, vui lòng thử lại" };
 
-const MESSAGES: Record<AuthErrorCode, LoginMessage> = {
+// Partial: the register-only codes have no login message and fall back to the generic one.
+const MESSAGES: Partial<Record<AuthErrorCode, LoginMessage>> = {
   [AUTH_ERROR.EMAIL_REQUIRED]: { field: "email", message: "Vui lòng nhập email" },
   [AUTH_ERROR.PASSWORD_REQUIRED]: { field: "password", message: "Vui lòng nhập mật khẩu" },
   [AUTH_ERROR.INVALID_CREDENTIALS]: { field: "form", message: "Email hoặc mật khẩu không đúng" },
