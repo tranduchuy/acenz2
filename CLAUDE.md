@@ -38,6 +38,8 @@ apps/api (Express 5 + TypeORM + Postgres)      @acenz/tsconfig = shared tsconfig
 
 `README.md` lists only `web`, `api`, `shared` and `tsconfig`; `core`, `tokens` and `ui` also exist (see `docs/design-system.md`, written in Vietnamese).
 
+**`apps/api` has a mandatory layered architecture: `routes/ → middlewares/ → controllers/ → services/ → repositories/ → db/entities/`, plus `utils/` (pure functions) and `constants/` (API-internal values). Read the "Architecture" section of `apps/api/README.md` BEFORE planning or writing anything under `apps/api/src/`, and the hard rules in `apps/api/CLAUDE.md`. One direction only: a controller never touches a repository, entity or `typeorm`; a service never touches express or `typeorm`; TypeORM queries exist only in `repositories/`. If a change does not fit, stop and say so rather than inventing a variation.**
+
 **Cross-package rules that need several files to see:**
 
 - **DTOs are defined once, in `packages/shared`, as Zod schemas**; types come from `z.infer`. The API builds/validates responses with them and the web app parses responses with the same schema (see `/api/health`).

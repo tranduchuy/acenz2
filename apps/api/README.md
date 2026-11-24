@@ -2,6 +2,141 @@
 
 Express + TypeORM API.
 
+## Architecture
+
+**Read this before adding or changing anything under `src/`.** Five layers, one direction. A
+request flows down the chain; no layer ever calls upwards, and no layer may be skipped.
+
+```
+HTTP request
+   │
+   ├─▶ routes/         paths and verbs. Attach middleware, delegate to one controller handler.
+   │                   No logic, no validation, no data access.
+   ├─▶ middlewares/    cross-cutting concerns: auth guard, body parsing, error mapping.
+   │                   The only place besides routes that knows about `next()`.
+   ├─▶ controllers/    the HTTP boundary. Validate input with a Zod schema from
+   │                   `@acenz/shared`, call exactly one service, map its result to a
+   │                   status code and a DTO. No business rules, no database.
+   ├─▶ services/       the business rules. Plain TypeScript: no `req`/`res`, no express
+   │                   types, no TypeORM. Receives its data access as injected functions.
+   ├─▶ repositories/   the only place TypeORM queries are written. Returns plain objects or
+   │                   narrow entity subsets, never a query builder or a live entity graph.
+   └─▶ db/entities/    table mappings. Imported by repositories and `data-source` only.
+```
+
+### Folder map
+
+```
+apps/api/src/
+├── routes/            <feature>.routes.ts          → createXRouter(controller)
+├── middlewares/       <name>.middleware.ts         → createXMiddleware(deps)
+├── controllers/       <feature>.controller.ts      → createXController(services)
+├── services/          <feature>.service.ts         → createXService(deps)
+├── repositories/      <name>.repository.ts         → createFindX(dataSource, ...)
+├── db/
+│   ├── entities/      <Name>.ts                    TypeORM entities (PascalCase)
+│   ├── migrations/    <timestamp>-<Name>.ts
+│   └── data-source.ts  create-data-source.ts  check-db.ts  ensure-initialized.ts
+├── utils/             pure, reusable functions
+├── constants/         API-internal constant values
+├── config/            env.ts - Zod-validated environment
+├── app.ts             mounts middleware + routers; takes all deps as arguments
+├── server.ts          listen() helper
+└── index.ts           composition root: builds every dependency, starts the server
+```
+
+`utils/`, `constants/`, `config/` and `db/` are **support folders, not layers**. They sit beside
+the chain and are imported into it; they never import from it.
+
+### Import rules
+
+The chain is enforced by what each file is allowed to import. This table is the contract:
+
+| Layer           | May import                                                              | Must never import                        |
+| --------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
+| `routes/`       | `middlewares/`, `controllers/`, express                                 | services, repositories, entities         |
+| `middlewares/`  | `services/`, `utils/`, `constants/`, express                            | repositories, entities, typeorm          |
+| `controllers/`  | `services/`, `utils/`, `constants/`, `@acenz/shared`, express **types** | repositories, entities, typeorm          |
+| `services/`     | `utils/`, `constants/`, `@acenz/shared`, repository **types** only      | express, typeorm, entities (as values)   |
+| `repositories/` | `db/entities/`, typeorm, `utils/`, `constants/`                         | express, controllers, services           |
+| `db/entities/`  | typeorm                                                                 | everything else in `src/`                |
+| `utils/`        | `constants/` and nothing else from `src/`                               | services, repositories, entities, config |
+| `constants/`    | nothing                                                                 | everything                               |
+
+Two rules carry most of the weight:
+
+- **A service must stay runnable without a database.** It takes `findUserByEmail`-style
+  functions, never a `DataSource` or a repository object. That is what lets
+  `services/*.test.ts` run with plain fakes and no Postgres.
+- **A controller must stay runnable without a database.** `createApp` takes its dependencies as
+  arguments, so route tests use `supertest` against fake services.
+
+### `utils/` - pure functions
+
+Deterministic helpers with no business rules, no database access and no environment reads.
+Given the same input they return the same output.
+
+One deliberate exception: a util whose entire job is shaping an HTTP response may import express
+_types_ (`send-error.ts`). Anything that makes a decision belongs in a service instead.
+
+### `constants/` - API-internal values only
+
+Frozen values shared by more than one file: bcrypt cost, a dummy hash, default page sizes,
+table names.
+
+**If a constant is part of the HTTP contract, it does not go here - it goes in
+`packages/shared`.** Error codes and their status maps (`AUTH_ERROR`, `AUTH_ERROR_STATUS`) are
+read by the web app too, so `packages/shared` owns them. `src/constants/` is for values that
+never leave the API.
+
+### Naming and tests
+
+- One suffix per layer: `auth.routes.ts`, `auth.controller.ts`, `auth.service.ts`,
+  `user.repository.ts`, `require-auth.middleware.ts`. Entities are PascalCase: `User.ts`.
+- Every layer file exports a `create*` factory that takes its dependencies and returns the
+  handler, router or function. No module-level singletons, no top-level `new DataSource()`.
+- Tests sit next to their source as `<file>.test.ts` (vitest matches `src/**/*.test.ts`).
+  Services get unit tests with fakes; routes get `supertest` tests with fake services.
+
+### Adding an endpoint
+
+1. **Contract** - DTO and Zod schema in `packages/shared/src/<feature>/`, exported from its
+   `index.ts`. Both sides parse with the same schema.
+2. **Schema** - entity in `db/entities/` plus a migration, if a new table is involved.
+3. **Repository** - a named query function in `repositories/<name>.repository.ts`, exported
+   with its own type (`export type FindX = ...`).
+4. **Service** - business rules in `services/<feature>.service.ts`, taking that type as a dep.
+5. **Controller** - validate, call the service, map the result, in
+   `controllers/<feature>.controller.ts`.
+6. **Route** - path, middleware and controller in `routes/<feature>.routes.ts`.
+7. **Wire** - mount the router in `app.ts`; build the real dependencies in `index.ts`.
+8. **Test** - a service unit test and a route `supertest` test, at minimum.
+
+### Why this shape, and what it is not
+
+Layer-first folders were chosen over feature modules (`modules/auth/...`) because the folder
+tree is then the architecture diagram, and because the root `CLAUDE.md` already pins entities to
+`db/entities/` - feature modules would split every feature across the tree anyway.
+
+Deliberate non-goals:
+
+- **No DI container.** Factories are hand-wired in `index.ts`. If that wiring grows past about
+  40 lines, it moves to a single `src/composition.ts` - not to a library.
+- **No generic validation middleware for endpoints with typed errors.** Auth's Zod issue
+  messages _are_ `AuthErrorCode`s, so the controller parses and maps them. A generic
+  `validateBody(schema)` middleware may be added for endpoints that only ever need a plain 400.
+- **No repository base class or generic CRUD layer.** Repositories are named functions for the
+  queries the app actually makes.
+- **No ORM abstraction.** TypeORM is used directly, inside `repositories/` only.
+- **Entities never leave the API.** Importing them from `shared` or `web` would pull TypeORM
+  and its decorators into the browser bundle.
+
+### Status
+
+The layer folders above are the target for all new code. `src/auth/` still holds the older
+layout (`login-service.ts`, `user-repository.ts`, `token.ts`, `password.ts`) and is scheduled to
+be converted; until it is, treat this section - not that folder - as the pattern to copy.
+
 ## First-time setup
 
 Requirements: Node >= 24, pnpm, Docker. Run everything from the repo root.
