@@ -133,9 +133,17 @@ Deliberate non-goals:
 
 ### Status
 
-The layer folders above are the target for all new code. `src/auth/` still holds the older
-layout (`login-service.ts`, `user-repository.ts`, `token.ts`, `password.ts`) and is scheduled to
-be converted; until it is, treat this section - not that folder - as the pattern to copy.
+The login chain (`auth.routes.ts` → `auth.controller.ts` → `auth.service.ts` →
+`user.repository.ts`) follows this architecture and is the pattern to copy. Three older pieces do
+not, and are not to be copied:
+
+- `db/check-db.ts` runs `dataSource.query("SELECT 1")` outside `repositories/`, and imports its
+  `DbCheck` type from `routes/health.ts` (a lower layer importing a higher one).
+- `routes/health.ts` holds its handler inline instead of delegating to a controller.
+- There is no `middlewares/` folder yet: `createTokenVerifier` in `services/token.service.ts` is
+  written and tested but wired to no route.
+
+Fix these when the health endpoint or the first protected route is next touched.
 
 ## First-time setup
 

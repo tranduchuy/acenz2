@@ -43,8 +43,9 @@ One direction only. No layer calls upwards, no layer is skipped.
 - **A new endpoint follows the 8 steps** in README "Adding an endpoint", in that order, and
   lands with a service unit test plus a `supertest` route test.
 
-## Known exception
+## Known exceptions
 
-`src/auth/` still holds the pre-architecture layout (`login-service.ts`, `user-repository.ts`,
-`token.ts`, `password.ts`). Do not copy its shape for new work, and do not add files to it.
-Copy the README architecture instead.
+The login chain follows the architecture; copy it. These older pieces do not, so do not copy their
+shape: `db/check-db.ts` (a TypeORM query outside `repositories/`, and an import from
+`routes/health.ts`) and `routes/health.ts` (handler inline in the route, no controller). Copy the
+README architecture instead.
