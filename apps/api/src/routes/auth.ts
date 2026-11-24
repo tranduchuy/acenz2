@@ -1,5 +1,5 @@
 ﻿import express, { Router } from "express";
-import type { LoginFn } from "../auth/login-service";
+import type { LoginFn } from "../services/auth.service";
 import { createAuthController } from "../controllers/auth.controller";
 
 /** Mounted at `/api/auth`. Parses its own JSON so body errors map to login codes, not the app's generic 500. */

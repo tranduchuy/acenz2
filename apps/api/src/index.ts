@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { createApp } from "./app";
-import { createLoginService } from "./auth/login-service";
+import { createLoginService } from "./services/auth.service";
 import { verifyPassword } from "./utils/password";
 import { createTokenIssuer } from "./services/token.service";
 import { createFindUserByEmail } from "./repositories/user.repository";

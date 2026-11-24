@@ -1,5 +1,5 @@
 import express, { type ErrorRequestHandler } from "express";
-import type { LoginFn } from "./auth/login-service";
+import type { LoginFn } from "./services/auth.service";
 import { createAuthRouter } from "./routes/auth";
 import { createHealthRouter, type DbCheck } from "./routes/health";
 

@@ -6,7 +6,7 @@ import {
   type AuthErrorCode,
   type LoginSuccess,
 } from "@acenz/shared";
-import type { LoginFn } from "../auth/login-service";
+import type { LoginFn } from "../services/auth.service";
 import { sendError } from "../utils/send-error";
 
 const fail = (res: Parameters<typeof sendError>[0], code: AuthErrorCode) => sendError(res, AUTH_ERROR_STATUS[code], code);

@@ -1,7 +1,7 @@
 import request from "supertest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "../app";
-import type { LoginFn, LoginResult } from "../auth/login-service";
+import type { LoginFn, LoginResult } from "../services/auth.service";
 
 afterEach(() => vi.restoreAllMocks());
 

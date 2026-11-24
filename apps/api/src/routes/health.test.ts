@@ -2,7 +2,7 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { HealthResponseSchema } from "@acenz/shared";
 import { createApp } from "../app";
-import type { LoginFn } from "../auth/login-service";
+import type { LoginFn } from "../services/auth.service";
 
 const login: LoginFn = async () => ({ ok: true, token: "t" });
 
