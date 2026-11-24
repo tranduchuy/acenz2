@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { describe, expect, it } from "vitest";
-import { createTokenIssuer, createTokenVerifier } from "./token";
+import { createTokenIssuer, createTokenVerifier } from "./token.service";
 
 const SECRET = "a-test-secret-that-is-at-least-32-chars";
 const user = { id: "42", email: "a@x.com", passwordHash: "h", isLocked: false };

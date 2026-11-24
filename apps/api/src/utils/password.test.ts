@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DUMMY_HASH, verifyPassword } from "./password";
+import { DUMMY_HASH } from "../constants/auth.constants";
+import { verifyPassword } from "./password";
 import { FIXTURE_HASH_2Y, FIXTURE_PASSWORD } from "./test-fixtures";
 
 afterEach(() => vi.restoreAllMocks());

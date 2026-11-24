@@ -1,7 +1,7 @@
 import request from "supertest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "../app";
-import type { LoginFn, LoginResult } from "../auth/login-service";
+import type { LoginFn, LoginResult } from "../services/auth.service";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -10,7 +10,7 @@ function appWith(result: LoginResult | Error) {
     if (result instanceof Error) throw result;
     return result;
   });
-  return { app: createApp({ checkDb: async () => true, login }), login };
+  return { app: createApp({ checkDb: async () => true, authService: { login } }), login };
 }
 
 const post = (app: ReturnType<typeof createApp>) => request(app).post("/api/auth/login");

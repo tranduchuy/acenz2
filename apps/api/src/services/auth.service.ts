@@ -1,12 +1,13 @@
 import { AUTH_ERROR, type AuthErrorCode } from "@acenz/shared";
-import { DUMMY_HASH, verifyPassword } from "./password";
-import type { IssueToken } from "./token";
-import type { FindUserByEmail } from "./user-repository";
+import { DUMMY_HASH } from "../constants/auth.constants";
+import { verifyPassword } from "../utils/password";
+import type { IssueToken } from "./token.service";
+import type { FindUserByEmail } from "../repositories/user.repository";
 
 export type LoginResult = { ok: true; token: string } | { ok: false; code: AuthErrorCode };
 export type LoginFn = (email: string, password: string) => Promise<LoginResult>;
 
-export interface LoginServiceDeps {
+export interface AuthServiceDeps {
   findUserByEmail: FindUserByEmail;
   verifyPassword: typeof verifyPassword;
   issueToken: IssueToken;
@@ -14,8 +15,12 @@ export interface LoginServiceDeps {
 
 const INVALID: LoginResult = { ok: false, code: AUTH_ERROR.INVALID_CREDENTIALS };
 
-export function createLoginService(deps: LoginServiceDeps): LoginFn {
-  return async (email, password) => {
+export interface AuthService {
+  login: LoginFn;
+}
+
+export function createAuthService(deps: AuthServiceDeps): AuthService {
+  const login: LoginFn = async (email, password) => {
     const user = await deps.findUserByEmail(email.trim());
     if (!user) {
       // Same bcrypt cost as a real check, so response time doesn't reveal which emails exist.
@@ -27,4 +32,5 @@ export function createLoginService(deps: LoginServiceDeps): LoginFn {
     if (user.isLocked) return { ok: false, code: AUTH_ERROR.ACCOUNT_LOCKED };
     return { ok: true, token: deps.issueToken(user) };
   };
+  return { login };
 }

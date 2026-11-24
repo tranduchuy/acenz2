@@ -1,6 +1,6 @@
 /** All fixture users share this password. */
 export const FIXTURE_PASSWORD = "Passw0rd!";
-/** `$2y$10$` bcrypt hash of FIXTURE_PASSWORD (same literal as apps/api/src/auth/test-fixtures.ts). */
+/** `$2y$10$` bcrypt hash of FIXTURE_PASSWORD (same literal as apps/api/src/utils/test-fixtures.ts). */
 export const FIXTURE_HASH_2Y = "$2y$10$AEJx23ZjEJDfbRzko1QDg.som1R9Eof71xSysj52fRDXvPMzV1cpu";
 export const FIXTURE_DOMAIN = "e2e.acenz.test";
 

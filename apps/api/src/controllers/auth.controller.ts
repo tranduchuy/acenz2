@@ -6,7 +6,7 @@ import {
   type AuthErrorCode,
   type LoginSuccess,
 } from "@acenz/shared";
-import type { LoginFn } from "../auth/login-service";
+import type { AuthService } from "../services/auth.service";
 import { sendError } from "../utils/send-error";
 
 const fail = (res: Parameters<typeof sendError>[0], code: AuthErrorCode) => sendError(res, AUTH_ERROR_STATUS[code], code);
@@ -16,13 +16,13 @@ export interface AuthController {
   handleError: ErrorRequestHandler;
 }
 
-export function createAuthController(loginService: LoginFn): AuthController {
+export function createAuthController(authService: AuthService): AuthController {
   const login: RequestHandler = async (req, res) => {
     const parsed = LoginRequestSchema.safeParse(req.body);
     // Schema issue messages are AuthErrorCodes (see LoginRequestSchema).
     if (!parsed.success) return fail(res, parsed.error.issues[0]!.message as AuthErrorCode);
 
-    const result = await loginService(parsed.data.email, parsed.data.password);
+    const result = await authService.login(parsed.data.email, parsed.data.password);
     if (!result.ok) return fail(res, result.code);
     const body: LoginSuccess = { token: result.token };
     res.status(200).json(body);
