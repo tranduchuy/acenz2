@@ -1,10 +1,39 @@
 import bcrypt from "bcryptjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DUMMY_HASH } from "../constants/auth.constants";
-import { verifyPassword } from "./password";
+import { hashPassword, verifyPassword } from "./password";
 import { FIXTURE_HASH_2Y, FIXTURE_PASSWORD } from "./test-fixtures";
 
 afterEach(() => vi.restoreAllMocks());
+
+describe("hashPassword", () => {
+  it("returns a 60-char bcrypt hash that is not the plain password", async () => {
+    const hash = await hashPassword(FIXTURE_PASSWORD);
+    expect(hash).toHaveLength(60);
+    expect(hash.startsWith("$2")).toBe(true);
+    expect(hash).not.toContain(FIXTURE_PASSWORD);
+  });
+
+  it("uses cost 10", async () => {
+    expect((await hashPassword(FIXTURE_PASSWORD)).startsWith("$2b$10$")).toBe(true);
+  });
+
+  it("round-trips through verifyPassword, and a wrong password does not match", async () => {
+    const hash = await hashPassword(FIXTURE_PASSWORD);
+    await expect(verifyPassword(FIXTURE_PASSWORD, hash)).resolves.toBe(true);
+    await expect(verifyPassword("other", hash)).resolves.toBe(false);
+  });
+
+  it("keeps spaces at the ends of the password", async () => {
+    const hash = await hashPassword(" S3cret! ");
+    await expect(verifyPassword(" S3cret! ", hash)).resolves.toBe(true);
+    await expect(verifyPassword("S3cret!", hash)).resolves.toBe(false);
+  });
+
+  it("salts: the same password hashes differently twice", async () => {
+    expect(await hashPassword("P")).not.toBe(await hashPassword("P"));
+  });
+});
 
 describe("verifyPassword", () => {
   it("accepts the right password for a $2y$10$ hash", async () => {

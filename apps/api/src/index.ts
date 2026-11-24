@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { createApp } from "./app";
 import { createAuthService } from "./services/auth.service";
-import { verifyPassword } from "./utils/password";
+import { hashPassword, verifyPassword } from "./utils/password";
 import { createTokenIssuer } from "./services/token.service";
-import { createFindUserByEmail } from "./repositories/user.repository";
+import { createCreateUser, createFindUserByEmail } from "./repositories/user.repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
 import { createDataSource } from "./db/create-data-source";
@@ -25,6 +25,8 @@ async function main(): Promise<void> {
   const authService = createAuthService({
     findUserByEmail: createFindUserByEmail(dataSource, ensureInitialized),
     verifyPassword,
+    hashPassword,
+    createUser: createCreateUser(dataSource, ensureInitialized),
     issueToken: createTokenIssuer({ secret: env.JWT_SECRET, expiresInSeconds: env.JWT_EXPIRES_IN_SECONDS }),
   });
 

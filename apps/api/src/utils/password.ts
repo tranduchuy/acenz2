@@ -1,5 +1,10 @@
 import bcrypt from "bcryptjs";
-import { BCRYPT_HASH_LENGTH, DUMMY_HASH } from "../constants/auth.constants";
+import { BCRYPT_COST, BCRYPT_HASH_LENGTH, DUMMY_HASH } from "../constants/auth.constants";
+
+/** Hashes a plain password exactly as given (no trimming) with bcrypt cost `BCRYPT_COST`. */
+export function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, BCRYPT_COST);
+}
 
 /**
  * Checks a plain password against a stored bcrypt hash (`$2y$`/`$2b$`/`$2a$`).
