@@ -1,10 +1,8 @@
 ﻿import express, { Router } from "express";
-import type { LoginFn } from "../services/auth.service";
-import { createAuthController } from "../controllers/auth.controller";
+import type { AuthController } from "../controllers/auth.controller";
 
 /** Mounted at `/api/auth`. Parses its own JSON so body errors map to login codes, not the app's generic 500. */
-export function createAuthRouter(login: LoginFn): Router {
-  const controller = createAuthController(login);
+export function createAuthRouter(controller: AuthController): Router {
   const router = Router();
   router.use(express.json());
   router.post("/login", controller.login);

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createLoginService } from "./auth.service";
+import { createAuthService } from "./auth.service";
 import { DUMMY_HASH } from "../constants/auth.constants";
 import type { LoginUser } from "../repositories/user.repository";
 
@@ -15,11 +15,11 @@ function setup(found: LoginUser | null) {
   const findUserByEmail = vi.fn(async (_email: string) => found);
   const verifyPassword = vi.fn(async (plain: string, stored: unknown) => stored === "good-hash" && plain === "P");
   const issueToken = vi.fn(() => "placeholder-token");
-  const login = createLoginService({ findUserByEmail, verifyPassword, issueToken });
+  const login = createAuthService({ findUserByEmail, verifyPassword, issueToken }).login;
   return { login, findUserByEmail, verifyPassword, issueToken };
 }
 
-describe("createLoginService", () => {
+describe("createAuthService", () => {
   it("returns a token for the right password", async () => {
     const { login } = setup(user());
     await expect(login("a@x.com", "P")).resolves.toEqual({ ok: true, token: "placeholder-token" });

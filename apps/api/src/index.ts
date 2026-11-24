@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { createApp } from "./app";
-import { createLoginService } from "./services/auth.service";
+import { createAuthService } from "./services/auth.service";
 import { verifyPassword } from "./utils/password";
 import { createTokenIssuer } from "./services/token.service";
 import { createFindUserByEmail } from "./repositories/user.repository";
@@ -22,7 +22,7 @@ async function main(): Promise<void> {
   const dataSource = createDataSource(env);
   const ensureInitialized = createEnsureInitialized(dataSource);
   const checkDb = createDbCheck(dataSource, ensureInitialized);
-  const login = createLoginService({
+  const authService = createAuthService({
     findUserByEmail: createFindUserByEmail(dataSource, ensureInitialized),
     verifyPassword,
     issueToken: createTokenIssuer({ secret: env.JWT_SECRET, expiresInSeconds: env.JWT_EXPIRES_IN_SECONDS }),
@@ -34,7 +34,7 @@ async function main(): Promise<void> {
   });
 
   try {
-    await startServer(createApp({ checkDb, login }), env.API_PORT);
+    await startServer(createApp({ checkDb, authService }), env.API_PORT);
   } catch (err) {
     console.error(`Failed to listen on port ${env.API_PORT}: ${(err as Error).message}`);
     process.exit(1);

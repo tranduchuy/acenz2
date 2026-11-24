@@ -10,7 +10,7 @@ function appWith(result: LoginResult | Error) {
     if (result instanceof Error) throw result;
     return result;
   });
-  return { app: createApp({ checkDb: async () => true, login }), login };
+  return { app: createApp({ checkDb: async () => true, authService: { login } }), login };
 }
 
 const post = (app: ReturnType<typeof createApp>) => request(app).post("/api/auth/login");
