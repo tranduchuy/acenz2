@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { createApp } from "./app";
 import { createLoginService } from "./auth/login-service";
 import { verifyPassword } from "./utils/password";
-import { createTokenIssuer } from "./auth/token";
+import { createTokenIssuer } from "./services/token.service";
 import { createFindUserByEmail } from "./repositories/user.repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
