@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import type { LoginUser } from "./user-repository";
+import type { LoginUser } from "../repositories/user.repository";
 
 export interface TokenConfig {
   /** HS256 signing secret. */

@@ -1,12 +1,10 @@
 import bcrypt from "bcryptjs";
+import { BCRYPT_COST, BCRYPT_HASH_LENGTH, DUMMY_HASH } from "../constants/auth.constants";
 
-const BCRYPT_HASH_LENGTH = 60;
-
-/**
- * A valid bcrypt hash of a random value nobody knows. Compared against when the email is unknown,
- * so that path costs the same time as a wrong password.
- */
-export const DUMMY_HASH = "$2b$10$JodWC0RCUDvpfcQfC9ASQ.m5AEhjJBJQuBs9YEVnb49cEDQ9qRCO6";
+/** Hashes a plain password exactly as given (no trimming) with bcrypt cost `BCRYPT_COST`. */
+export function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, BCRYPT_COST);
+}
 
 /**
  * Checks a plain password against a stored bcrypt hash (`$2y$`/`$2b$`/`$2a$`).

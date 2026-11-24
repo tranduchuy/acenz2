@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import { createApp } from "./app";
-import { createLoginService } from "./auth/login-service";
-import { verifyPassword } from "./auth/password";
-import { createTokenIssuer } from "./auth/token";
-import { createFindUserByEmail } from "./auth/user-repository";
+import { createAuthService } from "./services/auth.service";
+import { hashPassword, verifyPassword } from "./utils/password";
+import { createTokenIssuer } from "./services/token.service";
+import { createCreateUser, createFindUserByEmail } from "./repositories/user.repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
 import { createDataSource } from "./db/create-data-source";
@@ -22,9 +22,11 @@ async function main(): Promise<void> {
   const dataSource = createDataSource(env);
   const ensureInitialized = createEnsureInitialized(dataSource);
   const checkDb = createDbCheck(dataSource, ensureInitialized);
-  const login = createLoginService({
+  const authService = createAuthService({
     findUserByEmail: createFindUserByEmail(dataSource, ensureInitialized),
     verifyPassword,
+    hashPassword,
+    createUser: createCreateUser(dataSource, ensureInitialized),
     issueToken: createTokenIssuer({ secret: env.JWT_SECRET, expiresInSeconds: env.JWT_EXPIRES_IN_SECONDS }),
   });
 
@@ -34,7 +36,7 @@ async function main(): Promise<void> {
   });
 
   try {
-    await startServer(createApp({ checkDb, login }), env.API_PORT);
+    await startServer(createApp({ checkDb, authService }), env.API_PORT);
   } catch (err) {
     console.error(`Failed to listen on port ${env.API_PORT}: ${(err as Error).message}`);
     process.exit(1);

@@ -139,6 +139,16 @@ test("email with surrounding spaces logs in", async ({ page }) => {
   expect(res.status()).toBe(200);
 });
 
+test("links to the registration page and back", async ({ page }) => {
+  await expect(page.getByText("Chưa có tài khoản?")).toBeVisible();
+  await page.getByRole("link", { name: "Đăng ký" }).click();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.getByRole("heading", { name: "Tạo tài khoản" })).toBeVisible();
+  await page.getByRole("link", { name: "Đăng nhập" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Đăng nhập" })).toBeVisible();
+});
+
 test.describe("mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 
@@ -147,5 +157,10 @@ test.describe("mobile", () => {
     const res = await submit(page, USERS.ok.email, FIXTURE_PASSWORD);
     expect(res.status()).toBe(200);
     await expect(page.getByTestId("login-success")).toBeVisible();
+  });
+
+  test("the registration link is visible and works on a 375px screen", async ({ page }) => {
+    await page.getByRole("link", { name: "Đăng ký" }).click();
+    await expect(page).toHaveURL(/\/register$/);
   });
 });
