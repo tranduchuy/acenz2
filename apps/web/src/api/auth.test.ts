@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { login } from "./auth";
+import { login, register } from "./auth";
 
 type Call = { url: string; init?: RequestInit };
 
@@ -45,5 +45,46 @@ describe("login", () => {
       throw new TypeError("Failed to fetch");
     }) as typeof fetch;
     await expect(login("a@x.com", "P", failing)).resolves.toEqual({ ok: false, code: null });
+  });
+});
+
+describe("register", () => {
+  const input = { name: "Nguyen Van A", email: "a@x.com", phone: "0901234567", password: "P", confirmPassword: "P" };
+
+  it("returns the token on 201 and posts the five fields as JSON", async () => {
+    const calls: Call[] = [];
+    await expect(register(input, respond({ token: "t" }, 201, calls))).resolves.toEqual({ ok: true, token: "t" });
+    expect(calls[0].url).toBe("/api/auth/register");
+    expect(calls[0].init?.method).toBe("POST");
+    expect(new Headers(calls[0].init?.headers).get("Content-Type")).toBe("application/json");
+    expect(JSON.parse(String(calls[0].init?.body))).toEqual(input);
+  });
+
+  it.each([
+    [400, "AUTH_NAME_REQUIRED"],
+    [400, "AUTH_EMAIL_INVALID"],
+    [400, "AUTH_PHONE_INVALID"],
+    [400, "AUTH_PASSWORD_MISMATCH"],
+    [409, "AUTH_EMAIL_EXISTS"],
+    [500, "AUTH_INTERNAL_ERROR"],
+    [418, "SOMETHING_NEW"],
+  ])("returns the code from a %i response (%s)", async (status, code) => {
+    await expect(register(input, respond({ code }, status))).resolves.toEqual({ ok: false, code });
+  });
+
+  it.each([{}, { token: "" }, { token: 1 }])("returns code null for a 201 body without a usable token: %j", async (body) => {
+    await expect(register(input, respond(body, 201))).resolves.toEqual({ ok: false, code: null });
+  });
+
+  it("returns code null for a non-JSON response", async () => {
+    const html = (async () => new Response("<html>Bad Gateway</html>", { status: 502 })) as typeof fetch;
+    await expect(register(input, html)).resolves.toEqual({ ok: false, code: null });
+  });
+
+  it("returns code null on a network error", async () => {
+    const failing = (async () => {
+      throw new TypeError("Failed to fetch");
+    }) as typeof fetch;
+    await expect(register(input, failing)).resolves.toEqual({ ok: false, code: null });
   });
 });
