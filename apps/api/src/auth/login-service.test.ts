@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createLoginService } from "./login-service";
-import { DUMMY_HASH } from "./password";
+import { DUMMY_HASH } from "../constants/auth.constants";
 import type { LoginUser } from "./user-repository";
 
 const user = (over: Partial<LoginUser> = {}): LoginUser => ({

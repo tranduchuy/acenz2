@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { createApp } from "./app";
 import { createLoginService } from "./auth/login-service";
-import { verifyPassword } from "./auth/password";
+import { verifyPassword } from "./utils/password";
 import { createTokenIssuer } from "./auth/token";
 import { createFindUserByEmail } from "./auth/user-repository";
 import { loadEnv, type Env } from "./config/env";
