@@ -11,6 +11,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "e2e": "turbo run e2e",
     "format": "prettier --write .",
     "storybook": "turbo run storybook --filter=@acenz/ui",
     "build-storybook": "turbo run build-storybook"

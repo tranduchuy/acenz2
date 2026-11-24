@@ -1,0 +1,8 @@
+{
+  "extends": "@acenz/tsconfig/library.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "types": ["node"]
+  },
+  "include": ["*.ts", "fixtures", "tests"]
+}

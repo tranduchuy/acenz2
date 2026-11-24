@@ -17,6 +17,10 @@
     "test": {
       "dependsOn": ["^build"]
     },
+    "e2e": {
+      "dependsOn": ["^build", "@acenz/api#build"],
+      "cache": false
+    },
     "storybook": {
       "dependsOn": ["^build"],
       "cache": false,
