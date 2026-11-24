@@ -1,3 +1,4 @@
+import { inspect } from "node:util";
 import { describe, expect, it } from "vitest";
 import { createCreateUser, createFindUserByEmail } from "./user.repository";
 
@@ -78,16 +79,31 @@ describe("createCreateUser", () => {
     await expect(create(NEW_USER)).resolves.toEqual({ ok: false, reason: "email-exists" });
   });
 
-  it("rethrows a unique violation of another constraint", async () => {
-    const err = { driverError: { code: "23505", constraint: "users_slug_key" } };
+  it("fails with an error naming the Postgres code for a unique violation of another constraint", async () => {
+    const err = { driverError: { code: "23505", constraint: "users_slug_key", message: "duplicate key value" } };
     const { create } = insertFakes({ insert: () => Promise.reject(err) });
-    await expect(create(NEW_USER)).rejects.toBe(err);
+    await expect(create(NEW_USER)).rejects.toThrow(/23505/);
   });
 
-  it("rethrows any other failure", async () => {
-    const err = new Error("connection reset");
-    const { create } = insertFakes({ insert: () => Promise.reject(err) });
-    await expect(create(NEW_USER)).rejects.toBe(err);
+  it("fails with the original message for any other failure", async () => {
+    const { create } = insertFakes({ insert: () => Promise.reject(new Error("connection reset")) });
+    await expect(create(NEW_USER)).rejects.toThrow(/connection reset/);
+  });
+
+  // TypeORM's QueryFailedError keeps the query parameters, and Node prints them when the error is logged.
+  // The insert parameters include the bcrypt hash, so what is thrown must not carry them.
+  it("never lets the password hash travel with a failed insert", async () => {
+    const hash = "$2b$10$SECRETHASHSECRETHASHSECRETHASHSECRETHASHSECRETHASHSECRE";
+    const failure = Object.assign(new Error("connection reset"), {
+      query: "INSERT INTO users(...) VALUES ($1, $2)",
+      parameters: ["a@x.com", hash],
+      driverError: { code: "08006", parameters: [hash] },
+    });
+    const { create } = insertFakes({ insert: () => Promise.reject(failure) });
+    const thrown = await create({ ...NEW_USER, passwordHash: hash }).catch((e: unknown) => e);
+    expect(thrown).toBeInstanceOf(Error);
+    expect(inspect(thrown, { depth: 10 })).not.toContain(hash);
+    expect(JSON.stringify(thrown, Object.getOwnPropertyNames(thrown))).not.toContain(hash);
   });
 
   it("rejects without inserting when initialisation fails", async () => {

@@ -31,9 +31,20 @@ const isEmailTaken = (err: unknown): boolean => {
 };
 
 /**
+ * A fresh error with only the message and the Postgres code. TypeORM's own error also carries the query
+ * parameters, which include the password hash, and Node prints them when the error is logged.
+ */
+const insertFailure = (err: unknown): Error => {
+  const driverError = (err as { driverError?: { code?: string; message?: string } } | null)?.driverError;
+  const message = err instanceof Error ? err.message : (driverError?.message ?? "unknown error");
+  return new Error(`Could not create the user${driverError?.code ? ` (Postgres ${driverError.code})` : ""}: ${message}`);
+};
+
+/**
  * Inserts a student account (`role = 'student'`, not locked). The database generates the id.
  * A violation of the email unique index becomes `{ ok: false, reason: "email-exists" }`, which is
- * what makes two simultaneous registrations with one email safe; any other failure is rethrown.
+ * what makes two simultaneous registrations with one email safe; any other failure is rethrown as a
+ * clean error (see `insertFailure`) so the hash never reaches the logs.
  */
 export function createCreateUser(
   dataSource: Pick<DataSource, "getRepository">,
@@ -49,7 +60,7 @@ export function createCreateUser(
       return { ok: true, user: { id, email, passwordHash, isLocked: false } };
     } catch (err) {
       if (isEmailTaken(err)) return { ok: false, reason: "email-exists" };
-      throw err;
+      throw insertFailure(err);
     }
   };
 }
