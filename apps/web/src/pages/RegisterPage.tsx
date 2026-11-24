@@ -1,10 +1,10 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { Link } from "react-router";
 import { Banner, Button, PasswordField, TextField } from "@acenz/ui";
 import { register } from "../api/auth";
 import { registerErrorMessage, type RegisterField } from "../auth/register-messages";
 import { validateRegister, type RegisterErrors } from "../auth/register-validation";
 import { AuthLayout } from "../components/AuthLayout";
+import { AuthSwitchLink } from "../components/AuthSwitchLink";
 
 type Status = "idle" | "submitting" | "success";
 
@@ -106,12 +106,7 @@ export default function RegisterPage() {
         </Button>
       </form>
 
-      <p className="m-0 text-center text-body-sm text-ink-muted">
-        Đã có tài khoản?{" "}
-        <Link to="/login" className="font-medium text-brand hover:text-brand-hover">
-          Đăng nhập
-        </Link>
-      </p>
+      <AuthSwitchLink prompt="Đã có tài khoản?" to="/login" label="Đăng nhập" />
     </AuthLayout>
   );
 }

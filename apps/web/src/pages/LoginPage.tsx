@@ -3,6 +3,7 @@ import { Banner, Button, PasswordField, TextField } from "@acenz/ui";
 import { login } from "../api/auth";
 import { loginErrorMessage } from "../auth/login-messages";
 import { AuthLayout } from "../components/AuthLayout";
+import { AuthSwitchLink } from "../components/AuthSwitchLink";
 
 type FieldErrors = { email?: string; password?: string };
 type Status = "idle" | "submitting" | "success";
@@ -97,6 +98,8 @@ export default function LoginPage() {
           Đăng nhập
         </Button>
       </form>
+
+      <AuthSwitchLink prompt="Chưa có tài khoản?" to="/register" label="Đăng ký" />
     </AuthLayout>
   );
 }
