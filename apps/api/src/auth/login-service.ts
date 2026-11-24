@@ -2,7 +2,7 @@ import { AUTH_ERROR, type AuthErrorCode } from "@acenz/shared";
 import { DUMMY_HASH } from "../constants/auth.constants";
 import { verifyPassword } from "../utils/password";
 import type { IssueToken } from "./token";
-import type { FindUserByEmail } from "./user-repository";
+import type { FindUserByEmail } from "../repositories/user.repository";
 
 export type LoginResult = { ok: true; token: string } | { ok: false; code: AuthErrorCode };
 export type LoginFn = (email: string, password: string) => Promise<LoginResult>;

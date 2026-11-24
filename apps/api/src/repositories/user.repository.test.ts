@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createFindUserByEmail } from "./user-repository";
+import { createFindUserByEmail } from "./user.repository";
 
 function fakes(opts: { failInit?: boolean } = {}) {
   const calls: string[] = [];

@@ -3,7 +3,7 @@ import { createApp } from "./app";
 import { createLoginService } from "./auth/login-service";
 import { verifyPassword } from "./utils/password";
 import { createTokenIssuer } from "./auth/token";
-import { createFindUserByEmail } from "./auth/user-repository";
+import { createFindUserByEmail } from "./repositories/user.repository";
 import { loadEnv, type Env } from "./config/env";
 import { createDbCheck } from "./db/check-db";
 import { createDataSource } from "./db/create-data-source";
